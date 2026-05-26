@@ -1,0 +1,57 @@
+{
+  "_comment": "Configuration for applyChainUpdates Hardhat task. Run with: npx hardhat applyChainUpdates --viajsonfile --network <sourceChain>",
+
+  "sourcePool": "0x438b018EE0a96435818F300cd2A102e2a376d933",
+
+  "remoteChains": [
+    {
+      "destChain": "MANTLE_SEPOLIA",
+      "destPools": ["0x0000000000000000000000000000000000000001"],
+      "destToken": "0x0000000000000000000000000000000000000002",
+      "outboundRateLimit": {
+        "enabled": false,
+        "capacity": "0",
+        "rate": "0"
+      },
+      "inboundRateLimit": {
+        "enabled": false,
+        "capacity": "0",
+        "rate": "0"
+      }
+    },
+    {
+      "destChain": "ARBITRUM_SEPOLIA",
+      "destPools": [
+        "0x0000000000000000000000000000000000000003",
+        "0x0000000000000000000000000000000000000004"
+      ],
+      "destToken": "0x0000000000000000000000000000000000000005",
+      "outboundRateLimit": {
+        "enabled": true,
+        "capacity": "1000000000000000000000",
+        "rate": "100000000000000000"
+      },
+      "inboundRateLimit": {
+        "enabled": true,
+        "capacity": "1000000000000000000000",
+        "rate": "100000000000000000"
+      }
+    },
+    {
+      "destChain": "SOLANA_DEVNET",
+      "destChainFamily": "svm",
+      "destPools": ["3emsAVdmGKERbHjmGfQ6oZ1e35dkf5iYcS6U4CPKFVaa"],
+      "destToken": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "outboundRateLimit": {
+        "enabled": false,
+        "capacity": "0",
+        "rate": "0"
+      },
+      "inboundRateLimit": {
+        "enabled": false,
+        "capacity": "0",
+        "rate": "0"
+      }
+    }
+  ]
+}

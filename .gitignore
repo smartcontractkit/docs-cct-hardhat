@@ -1,0 +1,31 @@
+# Node modules
+/node_modules
+pnpm-lock.yaml
+
+# Compilation output
+/dist
+
+# pnpm deploy output
+/bundle
+
+# Hardhat Build Artifacts
+/artifacts
+
+# Hardhat compilation (v2) support directory
+/cache
+
+# Typechain output
+/types
+
+# Hardhat coverage reports
+/coverage
+
+# Deployments
+/deployments
+
+# dotenv environment variable files
+.env
+
+# MacOS files
+.DS_Store
+*/.DS_Store
