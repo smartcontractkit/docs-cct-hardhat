@@ -115,27 +115,44 @@ export const deployTokenPool = task(
         `[Step 1] Deploying BurnMintTokenPool on ${networkConfig.chainName}`
       );
 
-      const constructorArgs = Array<any>([
+      const constructorArgs = [
         tokenAddress,
         decimals,
         poolHooks,
-        rmnProxy,
-        router,
-      ]);
+        rmnProxy as Address,
+        router as Address,
+      ] as const;
 
-      const { contract, deploymentTransaction } =
-        await viem.sendDeploymentTransaction(
-          "BurnMintTokenPool",
-          ...constructorArgs
-        );
+      // Avoid hardhat-viem's sendDeploymentTransaction(), which immediately calls
+      // eth_getTransactionByHash after broadcasting. Some RPC providers (notably
+      // on certain L2 testnets) may not return the tx until it's mined, which
+      // causes TransactionNotFoundError even though the tx is valid.
+      const burnMintTokenPoolArtifact =
+        await hre.artifacts.readArtifact("BurnMintTokenPool");
+      const deploymentTxHash = await wallet.deployContract({
+        abi: burnMintTokenPoolArtifact.abi,
+        bytecode: burnMintTokenPoolArtifact.bytecode as `0x${string}`,
+        args: constructorArgs,
+      });
 
-      console.log(`⏳ Deployment tx: ${deploymentTransaction.hash}`);
+      console.log(`⏳ Deployment tx: ${deploymentTxHash}`);
       console.log(`   Waiting for ${confirmations} confirmation(s)...`);
 
-      await publicClient.waitForTransactionReceipt({
-        hash: deploymentTransaction.hash,
+      const deploymentReceipt = await publicClient.waitForTransactionReceipt({
+        hash: deploymentTxHash,
         confirmations,
       });
+
+      if (!deploymentReceipt.contractAddress) {
+        throw new Error(
+          `Deployment receipt missing contractAddress for tx ${deploymentTxHash}`
+        );
+      }
+
+      const contract = await viem.getContractAt(
+        "BurnMintTokenPool",
+        deploymentReceipt.contractAddress
+      );
 
       console.log(`Token Pool deployed at: ${contract.address}`);
       console.log(`${networkConfig.explorerUrl}/address/${contract.address}`);

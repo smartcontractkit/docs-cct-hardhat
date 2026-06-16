@@ -89,6 +89,23 @@ export const getCurrentRateLimits = task(
         "BurnMintTokenPool",
         poolAddress
       );
+      const publicClient = await viem.getPublicClient();
+
+      // Helpful guard: common failure is passing a pool address from a different chain than --network.
+      // In that case, the call will return "0x" (no bytecode / no data), which is confusing.
+      const bytecode = await publicClient.getBytecode({ address: poolAddress });
+      if (bytecode === undefined || bytecode === null || bytecode === "0x") {
+        throw new Error(
+          [
+            `No contract bytecode found at ${poolAddress} on network "${networkName}".`,
+            "This usually means the token pool address is from a different chain than --network.",
+            "",
+            "Fix:",
+            `- If the pool is on Ethereum Sepolia: use --network sepolia and --destchain mantleSepolia`,
+            `- If the pool is on Mantle Sepolia: use --network mantleSepolia and --destchain sepolia`,
+          ].join("\n")
+        );
+      }
       const v2 = await isV2Pool(poolContract, destChainSelector);
 
       console.log(`Pool Version: ${v2 ? "v2" : "v1"}`);
@@ -97,12 +114,16 @@ export const getCurrentRateLimits = task(
       if (fastfinality && v2) {
         await logRateLimiterStateWithFallback(
           poolContract,
+          poolAddress,
+          publicClient,
           destChainSelector,
           v2
         );
       } else {
         await logRateLimiterState(
           poolContract,
+          poolAddress,
+          publicClient,
           destChainSelector,
           fastfinality,
           v2

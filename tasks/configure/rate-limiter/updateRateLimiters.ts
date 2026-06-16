@@ -193,6 +193,8 @@ export const updateRateLimiters = task(
       console.log("Current Rate Limiter State:");
       await logRateLimiterState(
         poolContract,
+        poolAddress,
+        publicClient,
         destChainSelector,
         fastfinality,
         v2
@@ -202,6 +204,8 @@ export const updateRateLimiters = task(
       const { outbound: currentOut, inbound: currentIn } =
         await getCurrentConfigs(
           poolContract,
+          poolAddress,
+          publicClient,
           destChainSelector,
           fastfinality,
           v2

@@ -9,6 +9,7 @@ import { transferOwnership } from "./setup/transfer-ownership/transferOwnership"
 import { acceptOwnership } from "./setup/transfer-ownership/acceptOwnership";
 import { applyChainUpdates } from "./setup/applyChainUpdates";
 import { getSupportedChains } from "./setup/getSupportedChains";
+import { getTokenConfig } from "./setup/getTokenConfig";
 import { getTypeAndVersion } from "./setup/getTypeAndVersion";
 import { setPool } from "./setup/setPool";
 import { getFinalityConfig } from "./configure/finality-config/getFinalityConfig";
@@ -49,6 +50,7 @@ export const tasks = [
   acceptOwnership,
   applyChainUpdates,
   getSupportedChains,
+  getTokenConfig,
   getTypeAndVersion,
   setPool,
   getFinalityConfig,

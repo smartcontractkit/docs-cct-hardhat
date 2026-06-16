@@ -230,6 +230,7 @@ export const setFinalityConfig = task(
       );
       console.log("");
 
+      const publicClient = await viem.getPublicClient();
       // Show current rate limits for the lane (if --destchain provided)
       if (destchain) {
         console.log("----------------------------------------");
@@ -239,12 +240,13 @@ export const setFinalityConfig = task(
         console.log("----------------------------------------");
         await logRateLimiterStateWithFallback(
           poolContract,
+          poolAddress,
+          publicClient,
           remoteChainSelector,
           v2
         );
       }
 
-      const publicClient = await viem.getPublicClient();
       const [wallet] = await viem.getWalletClients();
 
       // Step 1: Set finality config
@@ -281,6 +283,8 @@ export const setFinalityConfig = task(
 
         const { outbound, inbound } = await getCurrentConfigs(
           poolContract,
+          poolAddress,
+          publicClient,
           remoteChainSelector,
           true,
           v2
@@ -341,6 +345,8 @@ export const setFinalityConfig = task(
         console.log("----------------------------------------");
         await logRateLimiterStateWithFallback(
           poolContract,
+          poolAddress,
+          publicClient,
           remoteChainSelector,
           v2
         );

@@ -1,3 +1,5 @@
+import type { Address, PublicClient } from "viem";
+
 // Shared helpers for rate limiter reads, logging, and updates.
 
 /**
@@ -168,6 +170,8 @@ export async function isV2Pool(
 export async function getCurrentBuckets(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   poolContract: any,
+  poolAddress: Address,
+  publicClient: PublicClient,
   remoteChainSelector: bigint,
   fastFinality: boolean,
   v2: boolean
@@ -183,13 +187,23 @@ export async function getCurrentBuckets(
       inbound: inbound as TokenBucket,
     };
   }
-  const outbound = await poolContract.read.getCurrentOutboundRateLimiterState([
-    remoteChainSelector,
-  ]);
-  const inbound = await poolContract.read.getCurrentInboundRateLimiterState([
-    remoteChainSelector,
-  ]);
-  return { outbound: outbound as TokenBucket, inbound: inbound as TokenBucket };
+
+  // v1 pools expose per-direction getters that are not present in the v2 ABI.
+  // Use the minimal v1 ABI directly to avoid AbiFunctionNotFoundError.
+  const outbound = (await publicClient.readContract({
+    address: poolAddress,
+    abi: tokenPoolV1Abi,
+    functionName: "getCurrentOutboundRateLimiterState",
+    args: [remoteChainSelector],
+  })) as unknown as TokenBucket;
+  const inbound = (await publicClient.readContract({
+    address: poolAddress,
+    abi: tokenPoolV1Abi,
+    functionName: "getCurrentInboundRateLimiterState",
+    args: [remoteChainSelector],
+  })) as unknown as TokenBucket;
+
+  return { outbound, inbound };
 }
 
 /**
@@ -199,12 +213,16 @@ export async function getCurrentBuckets(
 export async function getCurrentConfigs(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   poolContract: any,
+  poolAddress: Address,
+  publicClient: PublicClient,
   remoteChainSelector: bigint,
   fastFinality: boolean,
   v2: boolean
 ): Promise<{ outbound: RateLimiterConfig; inbound: RateLimiterConfig }> {
   const { outbound: ob, inbound: ib } = await getCurrentBuckets(
     poolContract,
+    poolAddress,
+    publicClient,
     remoteChainSelector,
     fastFinality,
     v2
@@ -238,16 +256,24 @@ function logBucketGroup(label: string, bucket: TokenBucket): void {
 export async function logRateLimiterStateWithFallback(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   poolContract: any,
+  poolAddress: Address,
+  publicClient: PublicClient,
   remoteChainSelector: bigint,
   v2: boolean
 ): Promise<void> {
   if (!v2) {
-    const outbound = await poolContract.read.getCurrentOutboundRateLimiterState(
-      [remoteChainSelector]
-    );
-    const inbound = await poolContract.read.getCurrentInboundRateLimiterState([
-      remoteChainSelector,
-    ]);
+    const outbound = (await publicClient.readContract({
+      address: poolAddress,
+      abi: tokenPoolV1Abi,
+      functionName: "getCurrentOutboundRateLimiterState",
+      args: [remoteChainSelector],
+    })) as unknown as TokenBucket;
+    const inbound = (await publicClient.readContract({
+      address: poolAddress,
+      abi: tokenPoolV1Abi,
+      functionName: "getCurrentInboundRateLimiterState",
+      args: [remoteChainSelector],
+    })) as unknown as TokenBucket;
     logBucket("Outbound [standard]", outbound as TokenBucket);
     logBucket("Inbound  [standard]", inbound as TokenBucket);
     console.log("");
@@ -290,12 +316,16 @@ export async function logRateLimiterStateWithFallback(
 export async function logRateLimiterState(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   poolContract: any,
+  poolAddress: Address,
+  publicClient: PublicClient,
   remoteChainSelector: bigint,
   fastFinality: boolean,
   v2: boolean
 ): Promise<void> {
   const { outbound, inbound } = await getCurrentBuckets(
     poolContract,
+    poolAddress,
+    publicClient,
     remoteChainSelector,
     fastFinality,
     v2

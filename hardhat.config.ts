@@ -32,7 +32,7 @@ export default defineConfig({
       default: {
         version: "0.8.24",
         settings: {
-          evmVersion: "paris",
+          evmVersion: "shanghai",
           optimizer: {
             enabled: true,
             runs: 200,
@@ -42,7 +42,7 @@ export default defineConfig({
       production: {
         version: "0.8.24",
         settings: {
-          evmVersion: "paris",
+          evmVersion: "shanghai",
           optimizer: {
             enabled: true,
             runs: 200,
