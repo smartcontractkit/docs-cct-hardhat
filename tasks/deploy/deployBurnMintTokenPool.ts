@@ -123,19 +123,12 @@ export const deployTokenPool = task(
         router,
       ]);
 
-      const { contract, deploymentTransaction } =
-        await viem.sendDeploymentTransaction(
-          "BurnMintTokenPool",
-          ...constructorArgs
-        );
-
-      console.log(`⏳ Deployment tx: ${deploymentTransaction.hash}`);
       console.log(`   Waiting for ${confirmations} confirmation(s)...`);
-
-      await publicClient.waitForTransactionReceipt({
-        hash: deploymentTransaction.hash,
-        confirmations,
-      });
+      const contract = await viem.deployContract(
+        "BurnMintTokenPool",
+        ...constructorArgs,
+        { confirmations }
+      );
 
       console.log(`Token Pool deployed at: ${contract.address}`);
       console.log(`${networkConfig.explorerUrl}/address/${contract.address}`);

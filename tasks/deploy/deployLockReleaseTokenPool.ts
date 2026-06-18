@@ -103,8 +103,6 @@ export const deployLockReleaseTokenPool = task(
       console.log("========================================");
       console.log("");
 
-      const publicClient = await viem.getPublicClient();
-
       // Read decimals from token; fall back to --localtokendecimals
       let decimals: number;
       try {
@@ -142,17 +140,13 @@ export const deployLockReleaseTokenPool = task(
         router,
         lockBoxAddress,
       ]);
-      const { contract, deploymentTransaction } =
-        await viem.sendDeploymentTransaction(
-          "LockReleaseTokenPool",
-          ...constructorArgs
-        );
-      console.log(`⏳ Deployment tx: ${deploymentTransaction.hash}`);
+
       console.log(`   Waiting for ${confirmations} confirmation(s)...`);
-      await publicClient.waitForTransactionReceipt({
-        hash: deploymentTransaction.hash,
-        confirmations,
-      });
+      const contract = await viem.deployContract(
+        "LockReleaseTokenPool",
+        ...constructorArgs,
+        { confirmations }
+      );
       console.log(`Token Pool deployed at: ${contract.address}`);
       console.log(`${explorerUrl}/address/${contract.address}`);
       console.log("✅ LockReleaseTokenPool deployed successfully!");
