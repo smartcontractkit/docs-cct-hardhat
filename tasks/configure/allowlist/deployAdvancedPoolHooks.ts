@@ -189,8 +189,6 @@ export const deployAdvancedPoolHooks = task(
       }
       console.log("");
 
-      const publicClient = await viem.getPublicClient();
-
       console.log(`[Step 1] Deploying AdvancedPoolHooks on ${chainName}`);
       const constructorArgs = Array<any>([
         allowlistAddresses,
@@ -198,17 +196,14 @@ export const deployAdvancedPoolHooks = task(
         policyEngineAddress,
         authorizedCallersAddresses,
       ]);
-      const { contract, deploymentTransaction } =
-        await viem.sendDeploymentTransaction(
-          "AdvancedPoolHooks",
-          ...constructorArgs
-        );
+
+      console.log(`   Waiting for ${confirmations} confirmation(s)...`);
+      const contract = await viem.deployContract(
+        "AdvancedPoolHooks",
+        ...constructorArgs,
+        { confirmations }
+      );
       const hooksAddress = contract.address;
-      console.log(`⏳ Deployment tx: ${deploymentTransaction.hash}`);
-      await publicClient.waitForTransactionReceipt({
-        hash: deploymentTransaction.hash,
-        confirmations,
-      });
       console.log("✅ AdvancedPoolHooks deployed successfully!");
 
       console.log("");

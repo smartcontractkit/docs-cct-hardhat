@@ -164,21 +164,14 @@ export const deployToken = task(
         zeroAddress as Address, // owner — address(0) defaults to deployer
       ]);
 
-      const { contract, deploymentTransaction } =
-        await viem.sendDeploymentTransaction(
-          "CrossChainToken",
-          ...constructorArgs
-        );
-
-      console.log(`⏳ Deployment tx: ${deploymentTransaction.hash}`);
       console.log(
         `   Waiting for ${networkConfig.confirmations} confirmation(s)...`
       );
-
-      await publicClient.waitForTransactionReceipt({
-        hash: deploymentTransaction.hash,
-        confirmations: networkConfig.confirmations,
-      });
+      const contract = await viem.deployContract(
+        "CrossChainToken",
+        ...constructorArgs,
+        { confirmations: networkConfig.confirmations }
+      );
 
       console.log(`Token deployed at: ${contract.address}`);
       console.log(`${networkConfig.explorerUrl}/address/${contract.address}`);

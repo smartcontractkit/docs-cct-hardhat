@@ -102,17 +102,13 @@ export const deployERC20LockBox = task(
 
       console.log(`[Step 1] Deploying ERC20LockBox on ${chainName}`);
       const constructorArgs = Array<any>([tokenAddress]);
-      const { contract: lockBox, deploymentTransaction } =
-        await viem.sendDeploymentTransaction(
-          "ERC20LockBox",
-          ...constructorArgs
-        );
-      console.log(`⏳ Deployment tx: ${deploymentTransaction.hash}`);
+
       console.log(`   Waiting for ${confirmations} confirmation(s)...`);
-      await publicClient.waitForTransactionReceipt({
-        hash: deploymentTransaction.hash,
-        confirmations,
-      });
+      const lockBox = await viem.deployContract(
+        "ERC20LockBox",
+        ...constructorArgs,
+        { confirmations }
+      );
       console.log(`ERC20LockBox deployed at: ${lockBox.address}`);
       console.log(`${explorerUrl}/address/${lockBox.address}`);
       console.log("✅ ERC20LockBox deployed successfully!");
