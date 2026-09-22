@@ -73,6 +73,21 @@ const rawConfigData = {
     explorerUrl: "https://explorer-sepolia.inkonchain.com",
     nativeCurrencySymbol: "INK",
   },
+  ARBITRUM_SEPOLIA: {
+    chainFamily: "evm" as const,
+    chainId: 421614,
+    chainSelector: "3478487238524512106",
+    router: "0x2a9C5afB0d0e4BAb2BCdaE109EC4b0c4Be15a165",
+    rmnProxy: "0x9527E2d01A3064ef6b50c1Da1C0cC523803BCFF2",
+    tokenAdminRegistry: "0x8126bE56454B628a88C17849B9ED99dd5a11Bd2f",
+    registryModuleOwnerCustom: "0xaD417c0611dBD225471D31F056b8B6beC1CBC153",
+    link: "0xb1D4538B4571d411F07960EF2838Ce337FE1E80E",
+    ccipBnM: "0x686325E21F55c64Bf724047E0fe7C454D6faD37D",
+    confirmations: 2,
+    chainName: "Arbitrum Sepolia",
+    explorerUrl: "https://sepolia.arbiscan.io",
+    nativeCurrencySymbol: "ETH",
+  },
   MANTLE_SEPOLIA: {
     chainFamily: "evm" as const,
     chainId: 5003,
@@ -130,7 +145,7 @@ export const configData: Record<string, NetworkConfig> = Object.fromEntries(
   Object.entries(rawConfigData).map(([key, config]) => [
     key,
     { ...config, chainNameIdentifier: key } as NetworkConfig,
-  ])
+  ]),
 );
 
 export function getNetworkConfig(chainId: number): NetworkConfig {
@@ -154,7 +169,7 @@ export function toHardhatNetworkName(name: string): string {
 const _lastSegmentEntries = Object.entries(rawConfigData)
   .filter(([, config]) => config.chainFamily === "evm")
   .map(
-    ([key]) => [key.split("_").pop()!.toLowerCase(), key] as [string, string]
+    ([key]) => [key.split("_").pop()!.toLowerCase(), key] as [string, string],
   );
 export const networkAliases: Record<string, string> = Object.fromEntries(
   Array.from(
@@ -178,8 +193,8 @@ export const networkAliases: Record<string, string> = Object.fromEntries(
       }
       // "sepolia": ETHEREUM_SEPOLIA already registered, BASE_SEPOLIA found → keep Ethereum.
       return map;
-    }, new Map<string, string>())
-  ).filter(([, key]) => key !== "")
+    }, new Map<string, string>()),
+  ).filter(([, key]) => key !== ""),
 );
 
 /**
@@ -214,7 +229,7 @@ export function getConfigByNetworkName(networkName: string): NetworkConfig {
   if (aliasKey) return configData[aliasKey];
   // Then match against normalized config keys
   const entry = Object.entries(configData).find(
-    ([key]) => toHardhatNetworkName(key) === normalized
+    ([key]) => toHardhatNetworkName(key) === normalized,
   );
   if (!entry)
     throw new Error(`Network "${networkName}" not found in helper-config`);
@@ -241,7 +256,7 @@ export function getDeployedTokenPool(chainId: number): string {
 
 export function parseChainName(chainName: string): number {
   const entry = Object.values(configData).find(
-    (c) => c.chainNameIdentifier === chainName
+    (c) => c.chainNameIdentifier === chainName,
   );
   if (!entry) throw new Error(`Invalid chain name: ${chainName}`);
   return entry.chainId;
@@ -253,7 +268,7 @@ export function getChainName(chainId: number): string {
 
 export function getChainNameBySelector(chainSelector: string): string {
   const entry = Object.values(configData).find(
-    (c) => c.chainSelector === chainSelector
+    (c) => c.chainSelector === chainSelector,
   );
   return entry?.chainName ?? "Unknown";
 }
@@ -265,7 +280,7 @@ export function getNativeCurrencySymbol(chainId: number): string {
 export function getExplorerUrl(
   chainId: number,
   pathType: string,
-  address: string
+  address: string,
 ): string {
   return `${getNetworkConfig(chainId).explorerUrl}${pathType}${address}`;
 }
@@ -289,7 +304,7 @@ export async function getClients(chainName: string): Promise<{
   const networkConfig = config.networks[hardhatNetworkName];
   if (!networkConfig || networkConfig.type !== "http") {
     throw new Error(
-      `Network "${hardhatNetworkName}" not found in Hardhat config or not an HTTP network`
+      `Network "${hardhatNetworkName}" not found in Hardhat config or not an HTTP network`,
     );
   }
 
@@ -299,7 +314,7 @@ export async function getClients(chainName: string): Promise<{
   if (!Array.isArray(accounts) || accounts.length === 0) {
     throw new Error(
       `No accounts configured for network "${hardhatNetworkName}". ` +
-        `Add accounts: [configVariable("PRIVATE_KEY")] to your network config in hardhat.config.ts.`
+        `Add accounts: [configVariable("PRIVATE_KEY")] to your network config in hardhat.config.ts.`,
     );
   }
   const privateKey = await accounts[0].getHexString();
