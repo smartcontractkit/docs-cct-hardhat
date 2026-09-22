@@ -33,7 +33,7 @@ Hardhat tasks for deploying and managing cross-chain tokens using Chainlink CCIP
 
    # RPC URLs
    ETHEREUM_SEPOLIA_RPC_URL=your_eth_sepolia_rpc
-   MANTLE_SEPOLIA_RPC_URL=your_mantle_sepolia_rpc
+   ARBITRUM_SEPOLIA_RPC_URL=your_arbitrum_sepolia_rpc  
 
    # Etherscan API key (required only if you use --verify on deployment tasks)
    ETHERSCAN_API_KEY=your_etherscan_api_key
@@ -69,8 +69,8 @@ Configure token parameters in `input/token.json` (see [Configuration Files](#con
 # Deploy on Ethereum Sepolia
 npx hardhat deployToken --network sepolia
 
-# Deploy on Mantle Sepolia
-npx hardhat deployToken --network mantleSepolia
+# Deploy on Arbitrum Sepolia
+npx hardhat deployToken --network arbitrumSepolia
 ```
 
 > **Note:** `--verify` requires `ETHERSCAN_API_KEY` to be set (see [Prerequisites](#prerequisites)). Etherscan API v2 supports all chains with a single key.
@@ -89,7 +89,7 @@ Set the token address so subsequent tasks can find it:
 
 ```bash
 export ETHEREUM_SEPOLIA_TOKEN=0x...
-export MANTLE_SEPOLIA_TOKEN=0x...
+export ARBITRUM_SEPOLIA_TOKEN=0x...
 ```
 
 Alternatively, pass the address directly via `--tokenaddress` on any task that requires it — no export needed.
@@ -104,8 +104,8 @@ Tokens are burned on source, minted on destination.
 # Deploy pool on Ethereum Sepolia
 npx hardhat deployTokenPool --network sepolia
 
-# Deploy pool on Mantle Sepolia
-npx hardhat deployTokenPool --network mantleSepolia
+# Deploy pool on Arbitrum Sepolia
+npx hardhat deployTokenPool --network arbitrumSepolia
 ```
 
 After each deployment, the pool address is automatically saved to:
@@ -144,8 +144,8 @@ npx hardhat updateAuthorizedCallers \
   --add <POOL_ADDRESS> \
   --network sepolia
 
-# 4. BurnMint pool on Mantle Sepolia (minting side)
-npx hardhat deployTokenPool --network mantleSepolia
+# 4. BurnMint pool on Arbitrum Sepolia (minting side)
+npx hardhat deployTokenPool --network arbitrumSepolia
 ```
 
 ###### Pattern B — Lock on Source, Release on Destination
@@ -158,8 +158,8 @@ Each chain needs its own `ERC20LockBox` and `LockReleaseTokenPool`.
 # 1. Deploy ERC20LockBox on Ethereum Sepolia
 npx hardhat deployERC20LockBox --network sepolia
 
-# 2. Deploy ERC20LockBox on Mantle Sepolia
-npx hardhat deployERC20LockBox --network mantleSepolia
+# 2. Deploy ERC20LockBox on Arbitrum Sepolia
+npx hardhat deployERC20LockBox --network arbitrumSepolia
 
 # Optional: add --authorizedcallers <DEPLOYER_OR_ISSUER_EOA> to either or both commands above
 
@@ -172,14 +172,14 @@ npx hardhat updateAuthorizedCallers \
   --add <ETHEREUM_SEPOLIA_POOL_ADDRESS> \
   --network sepolia
 
-# 5. Deploy LockRelease pool on Mantle Sepolia, passing its lockbox address from step 2
-npx hardhat deployLockReleaseTokenPool --lockbox <MANTLE_SEPOLIA_LOCKBOX_ADDRESS> --network mantleSepolia
+# 5. Deploy LockRelease pool on Arbitrum Sepolia, passing its lockbox address from step 2
+npx hardhat deployLockReleaseTokenPool --lockbox <ARBITRUM_SEPOLIA_LOCKBOX_ADDRESS> --network arbitrumSepolia
 
-# 6. Authorize the Mantle Sepolia pool on its lockbox
+# 6. Authorize the Arbitrum Sepolia pool on its lockbox
 npx hardhat updateAuthorizedCallers \
-  --lockbox <MANTLE_SEPOLIA_LOCKBOX_ADDRESS> \
-  --add <MANTLE_SEPOLIA_POOL_ADDRESS> \
-  --network mantleSepolia
+  --lockbox <ARBITRUM_SEPOLIA_LOCKBOX_ADDRESS> \
+  --add <ARBITRUM_SEPOLIA_POOL_ADDRESS> \
+  --network arbitrumSepolia
 ```
 
 The `LockReleaseTokenPool` requires the `ERC20LockBox` at deploy time, and the lockbox must authorize the pool (via `updateAuthorizedCallers`) before it can deposit/withdraw tokens. The deployment order is always: **lockbox → pool → authorize pool on lockbox**.
@@ -190,7 +190,7 @@ Set the pool address so subsequent tasks can find it:
 
 ```bash
 export ETHEREUM_SEPOLIA_TOKEN_POOL=0x...
-export MANTLE_SEPOLIA_TOKEN_POOL=0x...
+export ARBITRUM_SEPOLIA_TOKEN_POOL=0x...
 ```
 
 Alternatively, pass the address directly via `--tokenpool` on any task that requires it.
@@ -203,7 +203,7 @@ Each deployment is automatically saved:
 To verify the lockbox address is correctly attached to the pool:
 
 ```bash
-npx hardhat getLockBox --network mantleSepolia
+npx hardhat getLockBox --network arbitrumSepolia
 ```
 
 ### Step 3: Claim Admin (on both chains)
@@ -212,8 +212,8 @@ npx hardhat getLockBox --network mantleSepolia
 # On Ethereum Sepolia
 npx hardhat claimAdmin --network sepolia
 
-# On Mantle Sepolia
-npx hardhat claimAdmin --network mantleSepolia
+# On Arbitrum Sepolia
+npx hardhat claimAdmin --network arbitrumSepolia
 ```
 
 Optional: Pass `--ccipadmin 0x...` to specify the token's expected CCIP admin address (defaults to the deployer wallet).
@@ -224,18 +224,18 @@ Optional: Pass `--ccipadmin 0x...` to specify the token's expected CCIP admin ad
 # On Ethereum Sepolia
 npx hardhat acceptAdminRole --network sepolia
 
-# On Mantle Sepolia
-npx hardhat acceptAdminRole --network mantleSepolia
+# On Arbitrum Sepolia
+npx hardhat acceptAdminRole --network arbitrumSepolia
 ```
 
 ### Step 5: Apply Chain Updates (configure cross-chain routes)
 
 ```bash
-# Configure Ethereum Sepolia → Mantle Sepolia
-npx hardhat applyChainUpdates --destchain mantleSepolia --network sepolia
+# Configure Ethereum Sepolia → Arbitrum Sepolia
+npx hardhat applyChainUpdates --destchain arbitrumSepolia --network sepolia
 
-# Configure Mantle Sepolia → Ethereum Sepolia
-npx hardhat applyChainUpdates --destchain sepolia --network mantleSepolia
+# Configure Arbitrum Sepolia → Ethereum Sepolia
+npx hardhat applyChainUpdates --destchain sepolia --network arbitrumSepolia
 
 # Configure Ethereum Sepolia → Solana Devnet (non-EVM destination)
 npx hardhat applyChainUpdates \
@@ -252,34 +252,34 @@ This task is idempotent — if the destination chain is already configured on th
 Rate limiting is disabled by default. To enable it, pass the capacity and rate — `isEnabled` is automatically set to `true` when either value is provided:
 
 ```bash
-# Ethereum Sepolia → Mantle Sepolia: enable both directions
+# Ethereum Sepolia → Arbitrum Sepolia: enable both directions
 npx hardhat applyChainUpdates \
-  --destchain mantleSepolia \
+  --destchain arbitrumSepolia \
   --outboundcapacity 1000000000000000000000 \
   --outboundrate 100000000000000000 \
   --inboundcapacity 1000000000000000000000 \
   --inboundrate 100000000000000000 \
   --network sepolia
 
-# Mantle Sepolia → Ethereum Sepolia: enable both directions
+# Arbitrum Sepolia → Ethereum Sepolia: enable both directions
 npx hardhat applyChainUpdates \
   --destchain sepolia \
   --outboundcapacity 1000000000000000000000 \
   --outboundrate 100000000000000000 \
   --inboundcapacity 1000000000000000000000 \
   --inboundrate 100000000000000000 \
-  --network mantleSepolia
+  --network arbitrumSepolia
 
-# Enable outbound only (Sepolia → Mantle Sepolia)
+# Enable outbound only (Sepolia → Arbitrum Sepolia)
 npx hardhat applyChainUpdates \
-  --destchain mantleSepolia \
+  --destchain arbitrumSepolia \
   --outboundcapacity 1000000000000000000000 \
   --outboundrate 100000000000000000 \
   --network sepolia
 
-# Enable inbound only (Sepolia → Mantle Sepolia)
+# Enable inbound only (Sepolia → Arbitrum Sepolia)
 npx hardhat applyChainUpdates \
-  --destchain mantleSepolia \
+  --destchain arbitrumSepolia \
   --inboundcapacity 1000000000000000000000 \
   --inboundrate 100000000000000000 \
   --network sepolia
@@ -287,7 +287,7 @@ npx hardhat applyChainUpdates \
 
 | Flag                 | Required | Description                                                                |
 | -------------------- | -------- | -------------------------------------------------------------------------- |
-| `--destchain`        | Yes      | Destination chain name (e.g. `mantleSepolia`, `MANTLE_SEPOLIA`)            |
+| `--destchain`        | Yes      | Destination chain name (e.g. `arbitrumSepolia`, `ARBITRUM_SEPOLIA`)        |
 | `--tokenpool`        | No       | Source pool address — overrides the `{CHAIN}_TOKEN_POOL` env var           |
 | `--destpooladdress`  | No       | Destination pool address — overrides the `{DEST_CHAIN}_TOKEN_POOL` env var |
 | `--desttokenaddress` | No       | Destination token address — overrides the `{DEST_CHAIN}_TOKEN` env var     |
@@ -310,8 +310,8 @@ npx hardhat getSupportedChains --network sepolia
 # On Ethereum Sepolia
 npx hardhat setPool --network sepolia
 
-# On Mantle Sepolia
-npx hardhat setPool --network mantleSepolia
+# On Arbitrum Sepolia
+npx hardhat setPool --network arbitrumSepolia
 ```
 
 ## Ownership Management (Optional)
@@ -416,7 +416,7 @@ export RECEIVER=0xYourReceiverAddress
 ccip-cli send \
   --source ethereum-testnet-sepolia \
   --router $ETHEREUM_SEPOLIA_ROUTER \
-  --dest ethereum-testnet-sepolia-mantle-1 \
+  --dest ethereum-testnet-sepolia-arbitrum-1 \
   --transfer-tokens $ETHEREUM_SEPOLIA_TOKEN=1.23 \
   --receiver $RECEIVER \
   --wallet hardhat:$KEYSTORE_NAME
@@ -532,7 +532,7 @@ npx hardhat getFinalityConfig --network sepolia
 # Set block depth and configure the fast finality rate limit bucket:
 npx hardhat setFinalityConfig \
   --blockdepth 5 \
-  --destchain mantleSepolia \
+  --destchain arbitrumSepolia \
   --outboundcapacity 1000000000000000000000 \
   --outboundrate 100000000000000000 \
   --inboundcapacity 1000000000000000000000 \
@@ -543,7 +543,7 @@ npx hardhat setFinalityConfig \
 npx hardhat setFinalityConfig --blockdepth 5 --network sepolia
 
 # Set WAIT_FOR_SAFE mode and view current rate limits for a lane (no update):
-npx hardhat setFinalityConfig --waitforsafe --destchain mantleSepolia --network sepolia
+npx hardhat setFinalityConfig --waitforsafe --destchain arbitrumSepolia --network sepolia
 
 # Combine both modes (pool accepts either simultaneously):
 npx hardhat setFinalityConfig --blockdepth 5 --waitforsafe --network sepolia
@@ -573,7 +573,7 @@ Remote pools represent the pool addresses registered on a given chain for each s
 ##### View Remote Pools
 
 ```bash
-npx hardhat getRemotePools --destchain mantleSepolia --network sepolia
+npx hardhat getRemotePools --destchain arbitrumSepolia --network sepolia
 ```
 
 ##### Add a Remote Pool
@@ -582,7 +582,7 @@ Use after upgrading a pool on a remote chain. Both the old and new pool addresse
 
 ```bash
 npx hardhat addRemotePool \
-  --destchain mantleSepolia \
+  --destchain arbitrumSepolia \
   --remotepooladdress 0xNewRemotePoolAddress \
   --network sepolia
 ```
@@ -593,7 +593,7 @@ npx hardhat addRemotePool \
 
 ```bash
 npx hardhat removeRemotePool \
-  --destchain mantleSepolia \
+  --destchain arbitrumSepolia \
   --remotepooladdress 0xOldRemotePoolAddress \
   --network sepolia
 ```
@@ -715,7 +715,7 @@ npx hardhat getAuthorizedCallers --lockbox 0x... --network sepolia
 Reads and displays the current rate limiter state for a token pool lane. Compatible with both v1 and v2 pools.
 
 ```bash
-npx hardhat getCurrentRateLimits --destchain mantleSepolia --network sepolia
+npx hardhat getCurrentRateLimits --destchain arbitrumSepolia --network sepolia
 ```
 
 Optional: Pass `--fastfinality` to query the fast finality bucket (v2 pools only). Each direction is shown independently: the fast finality bucket is displayed where it is enabled; the standard finality bucket (fallback) is displayed where it is not.
@@ -727,7 +727,7 @@ Updates rate limiter configuration for a specific lane. Compatible with both v1 
 ```bash
 # Enable both directions
 npx hardhat updateRateLimiters \
-  --destchain mantleSepolia \
+  --destchain arbitrumSepolia \
   --outboundcapacity 1000000000000000000000 \
   --outboundrate 100000000000000000 \
   --inboundcapacity 1000000000000000000000 \
@@ -735,17 +735,17 @@ npx hardhat updateRateLimiters \
   --network sepolia
 
 # Disable outbound only
-npx hardhat updateRateLimiters --destchain mantleSepolia --outboundenabled false --network sepolia
+npx hardhat updateRateLimiters --destchain arbitrumSepolia --outboundenabled false --network sepolia
 
 # Disable inbound only
-npx hardhat updateRateLimiters --destchain mantleSepolia --inboundenabled false --network sepolia
+npx hardhat updateRateLimiters --destchain arbitrumSepolia --inboundenabled false --network sepolia
 
 # Disable both directions
-npx hardhat updateRateLimiters --destchain mantleSepolia --outboundenabled false --inboundenabled false --network sepolia
+npx hardhat updateRateLimiters --destchain arbitrumSepolia --outboundenabled false --inboundenabled false --network sepolia
 
 # Update the fast finality bucket (v2 only)
 npx hardhat updateRateLimiters \
-  --destchain mantleSepolia \
+  --destchain arbitrumSepolia \
   --fastfinality \
   --outboundcapacity 500000000000000000000 \
   --outboundrate 50000000000000000 \
@@ -772,7 +772,7 @@ Token pools v2.0 and later allow token issuers to configure fee parameters direc
 Reads the raw stored fee configuration for a destination lane.
 
 ```bash
-npx hardhat getTokenTransferFeeConfig --destchain mantleSepolia --network sepolia
+npx hardhat getTokenTransferFeeConfig --destchain arbitrumSepolia --network sepolia
 ```
 
 ##### Set or Update Fee Config
@@ -781,7 +781,7 @@ All fee config flags are optional — unset fields default to the current on-cha
 
 ```bash
 npx hardhat updateTokenTransferFeeConfig \
-  --destchain mantleSepolia \
+  --destchain arbitrumSepolia \
   --destgasoverhead 50000 \
   --destbytesoverhead 32 \
   --finalityfeeusdcents 0 \
@@ -806,7 +806,7 @@ npx hardhat updateTokenTransferFeeConfig \
 Disabling the fee config for a lane causes the OnRamp to fall back to FeeQuoter defaults.
 
 ```bash
-npx hardhat updateTokenTransferFeeConfig --destchain mantleSepolia --disable --network sepolia
+npx hardhat updateTokenTransferFeeConfig --destchain arbitrumSepolia --disable --network sepolia
 ```
 
 ## Supported Networks
@@ -818,7 +818,7 @@ All tasks accept any of the following name formats for `--network` and for chain
 | Chain            | `--network` / chain flags                        |
 | ---------------- | ------------------------------------------------ |
 | Ethereum Sepolia | `sepolia`, `ethereumSepolia`, `ETHEREUM_SEPOLIA` |
-| Mantle Sepolia   | `mantleSepolia`, `MANTLE_SEPOLIA`                |
+| Arbitrum Sepolia | `arbitrumSepolia`, `ARBITRUM_SEPOLIA`            |
 
 > **Note:** The short alias `sepolia` maps to `ETHEREUM_SEPOLIA`.
 
@@ -874,14 +874,14 @@ These are the deployed contract addresses used by tasks when no explicit flag is
 | Variable                 | Chain            |
 | ------------------------ | ---------------- |
 | `ETHEREUM_SEPOLIA_TOKEN` | Ethereum Sepolia |
-| `MANTLE_SEPOLIA_TOKEN`   | Mantle Sepolia   |
+| `ARBITRUM_SEPOLIA_TOKEN` | Arbitrum Sepolia |
 
 **Token pool addresses** — exported after [Step 2: Deploy Token Pools](#step-2-deploy-token-pools-on-both-chains):
 
 | Variable                      | Chain            |
 | ----------------------------- | ---------------- |
 | `ETHEREUM_SEPOLIA_TOKEN_POOL` | Ethereum Sepolia |
-| `MANTLE_SEPOLIA_TOKEN_POOL`   | Mantle Sepolia   |
+| `ARBITRUM_SEPOLIA_TOKEN_POOL` | Arbitrum Sepolia |
 
 **Non-EVM destination token addresses** — set before running [Step 5: Apply Chain Updates](#step-5-apply-chain-updates-configure-cross-chain-routes) when targeting a non-EVM chain. These are base58-encoded addresses, not `0x`-prefixed:
 
