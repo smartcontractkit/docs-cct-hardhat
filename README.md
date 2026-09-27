@@ -671,6 +671,23 @@ npx hardhat getAllowList --poolhooks 0x... --network sepolia
 npx hardhat isAllowListed --poolhooks 0x... --checkaddress 0x... --network sepolia
 ```
 
+### Manage the Policy Engine
+
+Connect an `AdvancedPoolHooks` contract to an ACE Policy Engine on the same chain, or disconnect the engine with the zero address. Only the hooks owner can call `setPolicyEngine`. When the hook connects, it calls `attach()` on the engine, which starts ACE target detection.
+
+```bash
+# Set the engine
+npx hardhat setPolicyEngine --poolhooks 0x... --policyengine 0xEngineAddress --network sepolia
+
+# Disconnect the engine (stops policy checks)
+npx hardhat setPolicyEngine --poolhooks 0x... --policyengine 0x0000000000000000000000000000000000000000 --network sepolia
+
+# Read the current engine
+npx hardhat getPolicyEngine --poolhooks 0x... --network sepolia
+```
+
+> When an old engine is set, `setPolicyEngine` calls `detach()` on it first and reverts `PolicyEngineDetachReverted` if that call reverts. The on-chain recovery path for that case is `setPolicyEngineAllowFailedDetach` on the hook itself.
+
 ### Manage Authorized Callers
 
 `AuthorizedCallers` is used in two places:

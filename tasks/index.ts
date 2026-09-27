@@ -31,6 +31,8 @@ import { updateAdvancedPoolHooks } from "./configure/allowlist/updateAdvancedPoo
 import { getAllowList } from "./configure/allowlist/getAllowList";
 import { isAllowListed } from "./configure/allowlist/isAllowListed";
 import { updateAllowList } from "./configure/allowlist/updateAllowList";
+import { getPolicyEngine } from "./configure/policy-engine/getPolicyEngine";
+import { setPolicyEngine } from "./configure/policy-engine/setPolicyEngine";
 import { mintTokens } from "./operations/mintTokens";
 import { depositToLockBox } from "./operations/depositToLockBox";
 import { withdrawFromLockBox } from "./operations/withdrawFromLockBox";
@@ -71,6 +73,8 @@ export const tasks = [
   getAllowList,
   isAllowListed,
   updateAllowList,
+  getPolicyEngine,
+  setPolicyEngine,
   mintTokens,
   depositToLockBox,
   withdrawFromLockBox,
